@@ -1,79 +1,42 @@
 services:
-  devcontainer:
-    image: "${DEVCONTAINER_IAMGE:-devcontainer:latest}"
-    hostname: "devcontainer"
-    container_name: "${COMPOSE_PROJECT_NAME}-devcontainer"
+  devops:
+    image: "${DEVOPS_IMAGE:-devops:latest}"
+    hostname: "devops"
+    container_name: "${COMPOSE_PROJECT_NAME}-devops"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     build:
-      context: ./devcontainer
+      context: ./devops
       dockerfile: Dockerfile
     volumes:
       - type: volume
-        source: devcontainer_hostkey
+        source: devops_hostkey
         target: /etc/ssh/hostkey
       - type: volume
-        source: devcontainer_vscode
-        target: "${BUILD_USER_HOME:-/home/admin}/.vscode-server"
+        source: devops_vscode
+        target: "${BUILD_USER_HOME:-/mnt/workspace}/.vscode-server"
       - type: volume
-        source: devcontainer_local
-        target: "${BUILD_USER_HOME:-/home/admin}/.local"
+        source: devops_python_uv
+        target: "${BUILD_USER_HOME:-/mnt/workspace}/.uv"
       - type: volume
-        source: devcontainer_nvm_nodejs
-        target: "${BUILD_USER_HOME:-/home/admin}/.nvm/versions/"
+        source: devops_nodejs_nvm
+        target: "${BUILD_USER_HOME:-/mnt/workspace}/.nvm/versions/"
       - type: volume
-        source: devcontainer_g_golang
-        target: "${BUILD_USER_HOME:-/home/admin}/.g/versions/"
+        source: devops_golang_bin
+        target: "${BUILD_USER_HOME:-/mnt/workspace}/.g/versions/"
       - type: volume
-        source: devcontainer_opencode
-        target: "${BUILD_USER_HOME:-/home/admin}/.config/opencode"
+        source: devops_golang_mod
+        target: "${BUILD_USER_HOME:-/mnt/workspace}/go/pkg/mod"
+      - type: volume
+        source: devops_rust_rustup
+        target: "${BUILD_USER_HOME:-/mnt/workspace}/.rustup"
+      - type: volume
+        source: devops_rust_cargo
+        target: "${BUILD_USER_HOME:-/mnt/workspace}/.cargo/registry"
+      - type: volume
+        source: devops_ruby_rbenv
+        target: "${BUILD_USER_HOME:-/mnt/workspace}/.rbenv/versions"
 
-
-  openclaw:
-    image: "${OPENCLAW_IAMGE:-openclaw:latest}"
-    hostname: "openclaw"
-    container_name: "${COMPOSE_PROJECT_NAME}-openclaw"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    build:
-      context: ./openclaw
-      dockerfile: Dockerfile
-      args:
-        DEVCONTAINER_IAMGE: "${DEVCONTAINER_IAMGE:-devcontainer:latest}"
-    ports:
-      - 18789:18789
-      - 18791:18791
-    volumes:
-      - type: volume
-        source: openclaw_workspace
-        target: "${BUILD_AGENT_USER_HOME:-/home/agent}/.openclaw/workspace"
-
-  ollama:
-    image: ollama/ollama
-    hostname: "ollama"
-    container_name: "${COMPOSE_PROJECT_NAME}-ollama"
-    environment:
-      OLLAMA_NUM_CTX: 32000
-      OLLAMA_FLASH_ATTENTION: 1
-      OLLAMA_KV_CACHE_TYPE: q8_0
-      OLLAMA_KEEP_ALIVE: 1h
-    ports:
-      - 11434:11434
-    volumes:
-      - type: volume
-        source: ollama_data
-        target: "/root/.ollama"
-
-
-  searxng:
-    image: searxng/searxng
-    hostname: "searxng"
-    container_name: "${COMPOSE_PROJECT_NAME}-searxng"
-    environment:
-      SEARXNG_HOST: '[::]'
-      SEARXNG_PORT: 18080
-    ports:
-      - 18080:18080
 
 networks:
   default:
@@ -81,11 +44,12 @@ networks:
     driver: bridge
 
 volumes:
-  devcontainer_hostkey:
-  devcontainer_vscode:
-  devcontainer_local:
-  devcontainer_nvm_nodejs:
-  devcontainer_g_golang:
-  devcontainer_opencode:
-  openclaw_workspace:
-  ollama_data:
+  devops_hostkey:
+  devops_vscode:
+  devops_python_uv:
+  devops_nodejs_nvm:
+  devops_golang_bin:
+  devops_golang_mod:
+  devops_rust_rustup:
+  devops_rust_cargo:
+  devops_ruby_rbenv:

@@ -1,4 +1,5 @@
 .env
 .data
+.pi
 *.bak
 compose.override.yml

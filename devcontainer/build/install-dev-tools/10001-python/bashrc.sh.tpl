@@ -1,9 +1,0 @@
-#! /usr/bin/bash
-
-export UV_DEFAULT_INDEX=${UV_DEFAULT_INDEX:-@@UV_DEFAULT_INDEX@@}
-export UV_INDEX=${UV_INDEX:-@@UV_INDEX@@}
-export UV_PYTHON_INSTALL_MIRROR=${UV_PYTHON_INSTALL_MIRROR:-@@UV_PYTHON_INSTALL_MIRROR@@}
-export UV_LINK_MODE=copy
-export UV_CACHE_DIR=~/.cache/uv
-export UV_SYSTEM_PYTHON=1
-export PATH="$HOME/.local/bin:$PATH"
