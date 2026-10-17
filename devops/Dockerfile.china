@@ -1,15 +1,9 @@
 ARG BASE_IMAGE=devops:latest
+
+
 FROM ${BASE_IMAGE}
-
 ARG DEBIAN_FRONTEND=noninteractive
-ARG BUILD_USER_NAME=agent
-
-USER root
-
-ADD ./build/configure-china-mirrors /tmp/configure-china-mirrors
-RUN cd /tmp/configure-china-mirrors \
-  && ./install.sh \
-  && apt clean \
-  && rm -rf /tmp/configure-china-mirrors /tmp/*
-
-USER ${BUILD_USER_NAME}
+COPY ./build/configure-china-mirrors /tmp/build
+RUN cd /tmp/build \
+  && sudo ./install.sh \
+  && sudo rm -rf /tmp/*

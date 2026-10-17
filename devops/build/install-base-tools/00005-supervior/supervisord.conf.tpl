@@ -1,7 +1,7 @@
 [unix_http_server]
 file=/var/run/supervisor.sock
 chmod=0770
-chown=@@UNIX_HTTP_SERVER_USER@@:@@UNIX_HTTP_SERVER_GROUP@@
+chown=@@UNIX_HTTP_SERVER_UID@@:@@UNIX_HTTP_SERVER_GID@@
 
 [supervisord]
 nodaemon=true

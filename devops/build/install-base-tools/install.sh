@@ -66,13 +66,12 @@ useradd -c 'agent' -d $BUILD_USER_HOME -s /bin/bash -N -m -u $BUILD_UID -g $BUIL
 sed -i 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD:ALL/' /etc/sudoers
 echo "umask 0002" >> "$BUILD_USER_HOME"/.bashrc
 
-user_home=$(getent passwd "$BUILD_USER_NAME" | cut -d: -f6)
 sudo -u "$BUILD_USER_NAME" bash -c 'mkdir -p $HOME/.bashrc.d/'
 echo '
 for filename in $(ls $HOME/.bashrc.d/*.sh 2>/dev/null | sort); do
   source "$filename"
 done
-' | sudo -u "$BUILD_USER_NAME" tee -a "$user_home/.bashrc"
+' | sudo -u "$BUILD_USER_NAME" tee -a "$BUILD_USER_HOME/.bashrc"
 
 for filename in $(ls ./*-*/setup.sh | sort); do
   cd $(dirname $filename)
@@ -81,7 +80,3 @@ for filename in $(ls ./*-*/setup.sh | sort); do
 done
 
 rsync -a --ignore-times ./rootfs/ /
-
-rm -rf /home/*/.sudo_as_admin_successful
-rm -rf /home/*/.cache
-rm -rf /root/.cache
