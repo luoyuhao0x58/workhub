@@ -4,6 +4,7 @@ set -uexo pipefail
 mkdir -p ~/.g/bin
 mkdir -p ~/.g/go
 mkdir -p ~/.g/versions
+mkdir -p ~/.go
 
 arch="$1"
 version=$(basename $(curl -I https://github.com/voidint/g/releases/latest 2>/dev/null | grep location | cut -d ' ' -f 2) | tr -cd '0-9.')
@@ -14,3 +15,4 @@ tar xzf "/tmp/$filename" -C ~/.g/bin
 cp ./genv ~/.g/env
 
 cat ./bashrc.sh.tpl >> "$HOME/.bashrc.d/$(basename "$(pwd -P)").sh"
+chmod a+x "$HOME/.bashrc.d/$(basename "$(pwd -P)").sh"

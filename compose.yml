@@ -26,7 +26,7 @@ services:
         target: "${BUILD_USER_HOME:-/mnt/workspace}/.g/versions/"
       - type: volume
         source: devops_golang_mod
-        target: "${BUILD_USER_HOME:-/mnt/workspace}/go/pkg/mod"
+        target: "${BUILD_USER_HOME:-/mnt/workspace}/.go/pkg/mod"
       - type: volume
         source: devops_rust_rustup
         target: "${BUILD_USER_HOME:-/mnt/workspace}/.rustup"

@@ -1,5 +1,5 @@
 #! /bin/sh
 
 export GOROOT="${HOME}/.g/go"
-[ -z "$GOPATH" ] && export GOPATH="${HOME}/go"
+[ -z "$GOPATH" ] && export GOPATH="${HOME}/.go"
 export PATH="${HOME}/.g/bin:${GOROOT}/bin:${GOPATH}/bin:$PATH"
