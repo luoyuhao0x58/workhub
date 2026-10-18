@@ -1,0 +1,121 @@
+/* macOS-style menu bar: one continuous translucent strip across the top.
+   No boxed groups and no persistent pill backgrounds; entries only reveal a
+   light tint while hovered, which is how the macOS menu bar behaves. */
+
+* {
+  font-family: "Noto Sans", "Noto Sans CJK SC", sans-serif;
+  font-size: 12.5px;
+  font-weight: 400;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+window#waybar {
+  background: rgba(28, 29, 33, 0.88);
+  color: #f2f2f4;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.modules-left,
+.modules-center,
+.modules-right {
+  background: transparent;
+  margin: 0;
+  padding: 0 6px;
+}
+
+/* Launcher entries */
+#custom-menu,
+#custom-terminal,
+#custom-files,
+#custom-browser,
+#custom-screenshot {
+  padding: 0 11px;
+  margin: 0 1px;
+  min-height: 28px;
+  border-radius: 5px;
+  color: #f2f2f4;
+  background: transparent;
+  transition: background 110ms ease;
+}
+
+#custom-menu:hover,
+#custom-terminal:hover,
+#custom-files:hover,
+#custom-browser:hover,
+#custom-screenshot:hover {
+  background: rgba(255, 255, 255, 0.11);
+}
+
+#custom-menu:active,
+#custom-terminal:active,
+#custom-files:active,
+#custom-browser:active,
+#custom-screenshot:active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Clock sits at the far right, like the macOS menu bar clock */
+#clock {
+  padding: 0 11px;
+  margin: 0 1px;
+  min-height: 28px;
+  color: #f2f2f4;
+  font-weight: 500;
+}
+
+/* Status indicators */
+#pulseaudio,
+#network,
+#tray {
+  padding: 0 9px;
+  margin: 0 1px;
+  min-height: 28px;
+  border-radius: 5px;
+  color: #d8d8dc;
+}
+
+#pulseaudio:hover,
+#network:hover {
+  background: rgba(255, 255, 255, 0.11);
+  color: #f2f2f4;
+}
+
+#pulseaudio.muted {
+  color: #7c7c85;
+}
+
+#network.disconnected {
+  color: #ff6b6b;
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+}
+
+/* Workspaces, if the module is enabled later */
+#workspaces button {
+  padding: 0 9px;
+  margin: 0 1px;
+  min-height: 28px;
+  border-radius: 5px;
+  color: #8d8d95;
+  background: transparent;
+}
+
+#workspaces button.active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+#workspaces button:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: #f2f2f4;
+}

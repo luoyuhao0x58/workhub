@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- Intentionally empty: no root-menu is defined, so the ShowMenu action
+     inherited from the default mouse bindings has nothing to open. The
+     desktop has no clickable menu because an injected absolute pointer
+     cannot drive one (see docs/desktop.md). -->
+<openbox_menu xmlns="https://github.com/labwc/labwc-menu">
+</openbox_menu>

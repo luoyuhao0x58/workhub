@@ -40,6 +40,27 @@ services:
         source: devops_playwright_browsers
         target: "/opt/playwright-browsers"
 
+  desktop:
+    image: "${DESKTOP_IMAGE:-desktop:latest}"
+    hostname: "desktop"
+    container_name: "${COMPOSE_PROJECT_NAME}-desktop"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${GUI_PORT:-1121}:1121"
+    shm_size: 2g
+    environment:
+      GUI_AUTH_PASSWORD: "${GUI_AUTH_PASSWORD:-}"
+    build:
+      context: ./desktop
+      dockerfile: Dockerfile
+      args:
+        DNF_MIRROR: "${DNF_MIRROR:-}"
+    volumes:
+      - type: volume
+        source: desktop_home
+        target: "${BUILD_USER_HOME:-/mnt/workspace}"
+
 
 networks:
   default:
@@ -57,3 +78,4 @@ volumes:
   devops_rust_cargo:
   devops_ruby_rbenv:
   devops_playwright_browsers:
+  desktop_home:

@@ -4,6 +4,8 @@ devops 是 workhub 的开发环境镜像，本地用 docker compose 起容器。
 
 本文讲镜像是怎么构建出来的：两个 Dockerfile 的分工、四组安装脚本的模式、容器入口、大陆环境配置，以及 CI 发布流程。
 
+桌面能力不在这个镜像里，由独立的 [desktop](desktop.md) 服务提供。
+
 ## 两个镜像的分工
 
 镜像分两层构建：
@@ -121,3 +123,5 @@ docker build -t devops:china \
 ```
 
 然后 `.env` 里 `DEVOPS_IMAGE=devops:china` 即可。
+
+桌面环境（labwc + selkies）不在这里，见 [docs/desktop.md](desktop.md)。

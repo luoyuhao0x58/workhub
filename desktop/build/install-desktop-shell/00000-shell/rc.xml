@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<labwc_config>
+  <!-- labwc is the session compositor. It runs headless (no DRM node in the
+       container) and publishes wayland-0, which is what selkies captures.
+
+       Keybinds work here because wlroots feeds virtual-keyboard events through
+       its normal seat pipeline. niri was tried first for its clickable menus
+       but ships without that routing in 26.04, which disabled every compositor
+       keybind; the menus are keyboard-driven instead (see gui-desktop-menu.sh
+       and the note in setup.sh). -->
+  <core>
+    <xwaylandPersistence>no</xwaylandPersistence>
+  </core>
+
+  <keyboard>
+    <default />
+
+    <!-- launchers -->
+    <keybind key="W-Return">
+      <action name="Execute" command="foot" />
+    </keybind>
+    <keybind key="W-space">
+      <action name="Execute" command="/usr/local/bin/gui-app-launcher.sh" />
+    </keybind>
+    <keybind key="W-d">
+      <action name="Execute" command="/usr/local/bin/gui-desktop-menu.sh" />
+    </keybind>
+    <keybind key="W-e">
+      <action name="Execute" command="nautilus" />
+    </keybind>
+    <keybind key="W-w">
+      <action name="Execute" command="firefox" />
+    </keybind>
+    <keybind key="W-v">
+      <action name="Execute" command="/usr/local/bin/gui-clipboard-history.sh" />
+    </keybind>
+    <keybind key="Print">
+      <action name="Execute" command="/usr/local/bin/gui-screenshot.sh" />
+    </keybind>
+
+    <!-- windows -->
+    <keybind key="W-q">
+      <action name="Close" />
+    </keybind>
+    <keybind key="W-f">
+      <action name="ToggleFullscreen" />
+    </keybind>
+    <keybind key="W-m">
+      <action name="ToggleMaximize" />
+    </keybind>
+    <keybind key="W-Left">
+      <action name="SnapToEdge" direction="left" />
+    </keybind>
+    <keybind key="W-Right">
+      <action name="SnapToEdge" direction="right" />
+    </keybind>
+    <keybind key="W-Up">
+      <action name="SnapToEdge" direction="up" />
+    </keybind>
+    <keybind key="W-Down">
+      <action name="SnapToEdge" direction="down" />
+    </keybind>
+    <keybind key="W-Tab">
+      <action name="NextWindow" />
+    </keybind>
+
+    <!-- Keyboard resize. Dragging a window border needs a stream of pointer
+         motion events, which an injected absolute pointer does not produce,
+         so the edges cannot be grabbed reliably. These adjust the same edges
+         without any pointer input. -->
+    <keybind key="W-C-Right">
+      <action name="ResizeRelative" right="25" />
+    </keybind>
+    <keybind key="W-C-Left">
+      <action name="ResizeRelative" right="-25" />
+    </keybind>
+    <keybind key="W-C-Down">
+      <action name="ResizeRelative" bottom="25" />
+    </keybind>
+    <keybind key="W-C-Up">
+      <action name="ResizeRelative" bottom="-25" />
+    </keybind>
+
+    <!-- workspaces -->
+    <keybind key="W-1"><action name="GoToDesktop" to="1" /></keybind>
+    <keybind key="W-2"><action name="GoToDesktop" to="2" /></keybind>
+    <keybind key="W-3"><action name="GoToDesktop" to="3" /></keybind>
+    <keybind key="W-4"><action name="GoToDesktop" to="4" /></keybind>
+    <keybind key="W-S-1"><action name="SendToDesktop" to="1" /></keybind>
+    <keybind key="W-S-2"><action name="SendToDesktop" to="2" /></keybind>
+    <keybind key="W-S-3"><action name="SendToDesktop" to="3" /></keybind>
+    <keybind key="W-S-4"><action name="SendToDesktop" to="4" /></keybind>
+
+    <!-- session -->
+    <keybind key="W-S-r">
+      <action name="Reconfigure" />
+    </keybind>
+  </keyboard>
+
+  <!-- No <default /> here on purpose. The stock bindings open labwc's own
+       root-menu on the desktop, and that menu cannot be used: wlroots turns
+       selkies' absolute pointer injection into a cursor warp, so the highlight
+       never follows the mouse and every entry is unclickable. It would also sit
+       on screen forever because clicking an item does nothing. Left and right
+       clicks on the desktop therefore do nothing at all (Windows-like), and the
+       entries live on the bar and on keybinds instead.
+
+       The window bindings below are the ones the desktop actually needs; they
+       are spelled out for the same reason (no <default /> means no inherited
+       mouse bindings). -->
+  <!-- The stock bindings must stay enabled. labwc tracks a press/release
+       pair per context and only runs a decoration button's action when the
+       matching Click entry exists; dropping <default /> made single clicks
+       on minimise/maximise/close do nothing while a double click still fired
+       DoubleClick. Desktop clicks are neutralised a different way: menu.xml
+       deliberately defines no root-menu, so the inherited ShowMenu finds
+       nothing to display instead of opening a popup that cannot be dismissed
+       with an injected pointer. -->
+  <mouse>
+    <default />
+
+    <context name="Root">
+      <mousebind button="Left" action="Press">
+        <action name="None" />
+      </mousebind>
+      <mousebind button="Right" action="Press">
+        <action name="None" />
+      </mousebind>
+    </context>
+  </mouse>
+</labwc_config>

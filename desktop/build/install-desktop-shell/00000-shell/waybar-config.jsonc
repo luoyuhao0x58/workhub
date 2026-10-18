@@ -1,0 +1,74 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 28,
+  "spacing": 6,
+  "modules-left": [
+    "custom/menu",
+    "custom/terminal",
+    "custom/files",
+    "custom/browser",
+    "custom/screenshot"
+  ],
+  "modules-center": [],
+  "modules-right": ["pulseaudio", "network", "tray", "clock"],
+
+  // Mouse shortcuts for the actions that also have keybinds (Super+Return,
+  // Super+space, Super+Shift+f/b, Print). Both work: clicks reach labwc fine,
+  // only Wayland menus cannot follow the pointer. The bar stays because a
+  // desktop with no visible affordance is hard to discover.
+  "custom/menu": {
+    "format": "<span font_family='FontAwesome'>\uf0c9</span> 菜单",
+    "tooltip-format": "Menu",
+    "on-click": "/usr/local/bin/gui-desktop-menu.sh"
+  },
+
+  "custom/terminal": {
+    "format": "<span font_family='FontAwesome'>\uf120</span> 终端",
+    "tooltip-format": "Terminal",
+    "on-click": "foot"
+  },
+
+  "custom/files": {
+    "format": "<span font_family='FontAwesome'>\uf07b</span> 文件",
+    "tooltip-format": "Files",
+    "on-click": "nautilus"
+  },
+
+  "custom/browser": {
+    "format": "<span font_family='FontAwesome'>\uf0ac</span> 浏览器",
+    "tooltip-format": "Browser",
+    "on-click": "firefox"
+  },
+
+  "custom/screenshot": {
+    "format": "<span font_family='FontAwesome'>\uf030</span> 截图",
+    "tooltip-format": "Screenshot",
+    "on-click": "/usr/local/bin/gui-screenshot.sh"
+  },
+
+
+  "clock": {
+    "format": "{:%H:%M}",
+    "tooltip-format": "{:%Y-%m-%d %A}"
+  },
+
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "muted",
+    "format-icons": ["low", "medium", "high"],
+    "on-click": "foot -e alsamixer"
+  },
+
+  "network": {
+    "format-wifi": "wifi {essid}",
+    "format-ethernet": "eth",
+    "format-disconnected": "offline",
+    "tooltip-format": "{ifname}"
+  },
+
+  "tray": {
+    "icon-size": 16,
+    "spacing": 6
+  }
+}

@@ -1,0 +1,12 @@
+ARG BASE_IMAGE=desktop:latest
+
+
+FROM ${BASE_IMAGE}
+# the base image runs as uid 1000; the mirror config writes to /etc
+USER root
+COPY ./build/configure-china-mirrors /tmp/build
+RUN cd /tmp/build \
+  && ./install.sh \
+  && rm -rf /tmp/build
+ARG BUILD_UID=1000
+USER ${BUILD_UID}
