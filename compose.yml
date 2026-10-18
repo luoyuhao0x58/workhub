@@ -5,6 +5,9 @@ services:
     container_name: "${COMPOSE_PROJECT_NAME}-devops"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    ports:
+      - "${GUI_PORT:-1121}:1121"
+    shm_size: 2g
     build:
       context: ./devops
       dockerfile: Dockerfile

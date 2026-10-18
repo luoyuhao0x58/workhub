@@ -39,6 +39,10 @@ COPY ./build/install-agent-tools /tmp/build
 RUN cd /tmp/build \
   && ./install.sh \
   && rm -rf /tmp/build
+COPY ./build/install-gui-tools /tmp/build
+RUN cd /tmp/build \
+  && ./install.sh \
+  && rm -rf /tmp/build
 COPY ./entrypoint.sh /.entrypoint.sh
 COPY ./build/clean.sh /tmp/clean.sh
 RUN /tmp/clean.sh

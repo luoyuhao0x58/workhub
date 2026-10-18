@@ -2,7 +2,7 @@
 
 devops 是 workhub 的开发环境镜像，本地用 docker compose 起容器。
 
-本文讲镜像是怎么构建出来的：两个 Dockerfile 的分工、四组安装脚本的模式、容器入口、大陆环境配置，以及 CI 发布流程。
+本文讲镜像是怎么构建出来的：两个 Dockerfile 的分工、五组安装脚本的模式、容器入口、大陆环境配置，以及 CI 发布流程。
 
 ## 两个镜像的分工
 
@@ -25,15 +25,17 @@ devops/
     ├── install-dev-tools/      # 语言工具链：python、node、golang 等
     ├── install-ops-tools/      # 运维工具：docker-cli、kubectl 等
     ├── install-agent-tools/    # agent 工具：openspec、pi
+    ├── install-gui-tools/      # GUI 远程桌面：labwc + selkies
     └── configure-china-mirrors/  # 大陆环境配置，system/ + langs/
 ```
 
-四组 install 目录是同一个模式：一个 `install.sh`，下面放若干子目录，每个子目录一个 `setup.sh`，分别管一组工具：
+五组 install 目录是同一个模式：一个 `install.sh`，下面放若干子目录，每个子目录一个 `setup.sh`，分别管一组工具：
 
 - `install-base-tools`：系统基础（git、zsh、ssh、supervisor 等）
 - `install-dev-tools`：语言工具链（python、node、golang、java、rust、ruby、php、vscode-server 等）
 - `install-ops-tools`：运维工具（docker-cli、kubectl、mysql、mongosh 等）
 - `install-agent-tools`：agent 工具（openspec、pi）
+- `install-gui-tools`：GUI 远程桌面（labwc 合成器 + selkies 流服务），放在最后执行
 
 子目录名开头的数字编号没有业务含义，只是让 `install.sh` 按顺序执行——它对目录名排序后逐个跑 setup.sh。
 
@@ -43,7 +45,7 @@ devops/
 
 1. 拷入 `su-exec`（来自 shinsenter/su-exec，容器内降权用）。
 2. 用 ARG 声明可调参数：uid/gid（默认 1000）、用户名（agent）、组名（devops）、home（/mnt/workspace）、locale（zh_CN.UTF-8）、时区（Etc/GMT-8）、docker 组 gid、openspec 和 pi 的版本。
-3. 依次 COPY 四组 install 目录并 RUN 各自的 `install.sh`，每组结束 `apt clean` 并清掉缓存和 `/tmp`，控制镜像体积。
+3. 依次 COPY 五组 install 目录并 RUN 各自的 `install.sh`，每组结束 `apt clean` 并清掉缓存和 `/tmp`，控制镜像体积。`install-gui-tools` 在 install-agent-tools 之后、最后执行。
 4. COPY `entrypoint.sh`，WORKDIR 设到 `/mnt/workspace`，USER 切到 agent，设置 ENTRYPOINT。
 
 ### install.sh 的模式
@@ -68,6 +70,40 @@ devops/
 3. 过滤 HOME/USER 等会话环境变量。
 4. 用户 home 下有 `.init` 脚本就执行（首次初始化钩子，比如注入 ssh key、clone 代码）。
 5. 以 su-exec root 启动 supervisord，托管 sshd 等常驻服务。
+
+## GUI 远程桌面（浏览器访问容器桌面）
+
+镜像里带了一套 GUI 环境：labwc（Wayland 合成器）+ selkies（浏览器远程桌面）。浏览器打开页面就能看到容器内的桌面、点应用、听声音，不需要装客户端。传输走 WebSocket 单端口，音视频都包在里面（pixelflux 视频 + pcmflux 音频）。
+
+GUI 会话默认不启动，`supervisorctl status` 里 `gui:*` 四个进程（dbus、pipewire、labwc、selkies）都是 STOPPED，按需手动拉起：
+
+```bash
+supervisorctl start gui:*   # 按依赖顺序拉起整个会话
+supervisorctl stop gui:*    # 停止
+```
+
+启动后浏览器访问 `http://localhost:1121`，用户名 agent。密码二选一：
+
+- compose 里设了 `GUI_AUTH_PASSWORD`，用它的值；
+- 没设，启动时自动生成随机密码，持久化在 `/tmp/runtime-agent/selkies-auth`（重启不变），同时打印在 selkies 日志里（`/var/log/supervisor/gui-selkies/stderr.log` 的 WARNING 行）。
+
+端口默认 1121，compose 的 `GUI_PORT` 可以覆盖。
+
+几个使用要点：
+
+- **无 GPU 也能跑**：容器里没显卡，labwc 用软件渲染（`WLR_BACKENDS=headless` + `WLR_RENDERER=pixman`），画面走 CPU 编码，流畅度看机器性能；宿主机有 /dev/dri 可以挂进容器走硬件路径。
+- **X11 应用**：桌面是 Wayland，但 XWayland 常驻在 `:0`，xterm 这类老 X 应用直接能跑。
+- **会话里启动 GUI 应用**：先 `supervisorctl start gui:*`，再设会话环境：
+
+  ```bash
+  export XDG_RUNTIME_DIR=/tmp/runtime-agent
+  export WAYLAND_DISPLAY=wayland-0
+  export DISPLAY=:0
+  ```
+
+  设好之后直接跑应用就行，Wayland 原生和 X11 的都可以。
+- **音频**：PipeWire 栈跟着会话一起起，浏览器端直接有声，不用单独配。
+- **公网**：1121 只建议在可信网络里用；要上公网，前面套一层反向代理 + TLS，注意 WebSocket 升级头要能转发。
 
 ## 中国大陆环境配置（Dockerfile.china）
 
