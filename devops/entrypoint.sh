@@ -17,4 +17,5 @@ mapfile -t ENV_ARRAY < <(env | grep -Ev "$EXCLUDE")
 init_script="$(getent passwd "$user" | cut -d: -f6)/.init"
 [ -f "$init_script" ] && sudo -u"$user" env "${ENV_ARRAY[@]}" bash "$init_script"
 
-exec su-exec root bash -c "chmod u-s $(which su-exec) ; exec supervisord -n -c /etc/supervisor/supervisord.conf"
+cd /tmp
+exec su-exec root bash -c "chmod u-s $(which su-exec) ; USER=root LOGNAME=root HOME=/root exec supervisord -n -c /etc/supervisor/supervisord.conf"

@@ -56,7 +56,7 @@ apt-get install -y \
   nmap tcpdump traceroute mtr \
   curl wget rsync \
   zip unzip unrar-free p7zip-full xz-utils \
-  file tree jq yq less source-highlight acl ripgrep \
+  file tree jq yq less source-highlight acl fd-find ripgrep \
   subversion \
   screen
 
