@@ -15,3 +15,5 @@ pipx install --global --system-site-packages ty
 pipx install --global --system-site-packages ipython
 
 sudo -u "$BUILD_USER_NAME" ./setup-user.sh
+
+apt-get install -y --no-install-recommends ca-certificates /tmp/py27.deb

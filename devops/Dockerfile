@@ -3,7 +3,9 @@ ARG BUILD_GID=1000
 ARG BUILD_USER_NAME=agent
 ARG BUILD_GROUP_NAME=devops
 ARG BUILD_USER_HOME=/mnt/workspace
+ARG PYTHON27_DEB_IMAGE=ghcr.io/luoyuhao0x58/python:2.7-deb
 
+FROM ${PYTHON27_DEB_IMAGE} AS python27-deb
 
 FROM debian:13-slim AS builder
 ARG DEBIAN_FRONTEND=noninteractive
@@ -21,6 +23,7 @@ COPY ./build/install-base-tools /tmp/build
 RUN cd /tmp/build \
   && ./install.sh \
   && rm -rf /tmp/build
+COPY --from=python27-deb /py27.deb /tmp/
 COPY ./build/install-dev-tools /tmp/build
 RUN cd /tmp/build \
   && ./install.sh \
