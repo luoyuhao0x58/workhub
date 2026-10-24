@@ -53,7 +53,7 @@ apt-get install -y \
   psmisc inotify-tools sysstat lsof \
   htop iftop ncdu atop iperf3 nload \
   netcat-openbsd net-tools iproute2 iputils-ping dnsutils telnet \
-  nmap tcpdump traceroute mtr \
+  nmap tcpdump traceroute mtr socat \
   curl wget rsync \
   zip unzip unrar-free p7zip-full xz-utils \
   file tree jq yq less source-highlight acl fd-find ripgrep \

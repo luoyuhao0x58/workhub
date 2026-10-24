@@ -7,8 +7,8 @@
 用 Docker 起一个开箱即用的开发环境：
 
 - 系统：debian:13-slim 环境、GMT+8 时区、sudo 免密
-- 开发工具：git、zsh、vim、tmux、ssh、python、node、golang、java、rust、ruby、php、vscode-server
-- 运维工具：docker-cli、kubectl、mysql、mongosh、postgresql、redis、sqlite、openvpn
+- 开发工具：git、zsh、vim、tmux、ssh、python、node、golang、java、rust、ruby、php、playwright
+- 运维工具：docker-cli、kubectl、mysql、mongosh、postgresql、redis、sqlite
 - agent 工具：openspec、pi
 - 单用户 agent（uid/gid 1000），supervisord 托管 sshd 等常驻服务
 
