@@ -1,3 +1,15 @@
+x-db-root-user: &db-root-user ${X_DB_ROOT_USER:-root}
+x-db-root-pass: &db-root-pass ${X_DB_ROOT_PASS:-please-change-your-password}
+x-db-user: &db-user ${X_DB_USER:-agent}
+x-db-pass: &db-pass ${X_DB_PASS:-please-change-your-password}
+x-timezone: &default-timezone ${X_TIMEZONE:-Etc/GMT-8}
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "${X_LOG_MAX_SIZE:-50m}"
+    max-file: "${X_LOG_MAX_FILE:-3}"
+    compress: "true"
+
 services:
   devops:
     image: "${DEVOPS_IMAGE:-devops:latest}"
@@ -40,6 +52,107 @@ services:
         source: devops_playwright_browsers
         target: "/opt/playwright-browsers"
 
+  mysql:
+    profiles: ["mysql", "infra", "dev"]
+    image: "${MYSQL_IMAGE:-mysql:latest}"
+    hostname: "mysql"
+    container_name: "${COMPOSE_PROJECT_NAME}-mysql"
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+      - "--require-secure-transport=OFF"
+    logging: *default-logging
+    environment:
+      TZ: *default-timezone
+      MYSQL_ROOT_PASSWORD: *db-root-pass
+      MYSQL_USER: *db-user
+      MYSQL_PASSWORD: *db-pass
+      MYSQL_ROOT_HOST: '%'
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  postgres:
+    profiles: ["postgres", "infra", "dev"]
+    image: "${PG_IMAGE:-postgres:latest}"
+    logging: *default-logging
+    environment:
+      TZ: *default-timezone
+      POSTGRES_USER: *db-user
+      POSTGRES_PASSWORD: *db-pass
+      POSTGRES_DB: test
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  mongodb:
+    profiles: ["mongodb", "infra", "dev"]
+    image: "${MONGODB_IMAGE:-mongo:latest}"
+    hostname: "mongodb"
+    container_name: "${COMPOSE_PROJECT_NAME}-mongodb"
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--keyFile", "/data/configdb/mongo-keyfile"]
+    logging: *default-logging
+    environment:
+      TZ: *default-timezone
+      MONGO_INITDB_ROOT_USERNAME: *db-root-user
+      MONGO_INITDB_ROOT_PASSWORD: *db-root-pass
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -e
+        KEYFILE=/data/configdb/mongo-keyfile
+        if [ ! -f "$$KEYFILE" ]; then
+          echo "Generating keyfile..."
+          mkdir -p /data/configdb
+          openssl rand -base64 756 > "$$KEYFILE"
+        fi
+        chmod 400 "$$KEYFILE"
+        chown 999:999 "$$KEYFILE" 2>/dev/null || true
+        exec /usr/local/bin/docker-entrypoint.sh mongod --replSet rs0 --bind_ip_all --keyFile "$$KEYFILE"
+    healthcheck:
+      test: >
+        mongosh -u $${MONGO_INITDB_ROOT_USERNAME} -p $${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --quiet --eval '
+        try { rs.status().ok } catch (e) {
+          rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongodb:27017"}]}).ok
+        }'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+
+  redis:
+    profiles: ["redis", "infra", "dev"]
+    image: "${REDIS_IMAGE:-redis:latest}"
+    hostname: "redis"
+    container_name: "${COMPOSE_PROJECT_NAME}-redis"
+    logging: *default-logging
+    environment:
+      TZ: *default-timezone
+      REDIS_PASSWORD: *db-root-pass
+    command: >
+      /bin/sh -c 'exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"'
+    healthcheck:
+      test: ["CMD-SHELL", 'exec redis-cli -a "$$REDIS_PASSWORD" ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - redis_data:/data
 
 networks:
   default:
@@ -57,3 +170,8 @@ volumes:
   devops_rust_cargo:
   devops_ruby_rbenv:
   devops_playwright_browsers:
+  mysql_data:
+  postgres_data:
+  mongodb_data:
+  mongodb_config:
+  redis_data:
