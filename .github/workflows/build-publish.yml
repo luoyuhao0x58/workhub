@@ -43,6 +43,7 @@ jobs:
           push: true
           platforms: linux/${{ matrix.platform }}
           tags: ${{ env.IMAGE }}:latest-${{ matrix.platform }}
+          network: host
 
       - name: Build and push china image
         uses: docker/build-push-action@v6

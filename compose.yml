@@ -82,6 +82,8 @@ services:
   postgres:
     profiles: ["postgres", "infra", "dev"]
     image: "${PG_IMAGE:-postgres:latest}"
+    hostname: "postgres"
+    container_name: "${COMPOSE_PROJECT_NAME}-postgres"
     logging: *default-logging
     environment:
       TZ: *default-timezone

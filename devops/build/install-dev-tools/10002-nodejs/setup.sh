@@ -11,6 +11,7 @@ filename=node-${VERSION}-linux-${ARCH}.tar.xz
 curl -LO https://nodejs.org/dist/${VERSION}/${filename}
 tar -xJf ${filename} -C /usr/local --strip-components=1 --exclude='*.md' --exclude='LICENSE'
 
+npm install -g corepack@latest
 corepack enable
 
 cp ./bashrc.sh.tpl /tmp/nodejs.sh

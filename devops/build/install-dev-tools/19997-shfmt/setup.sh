@@ -22,6 +22,6 @@ function get_arch() {
     esac
 }
 
-version=$(basename $(curl -I https://github.com/mvdan/sh/releases/latest 2>/dev/null | grep location | cut -d ' ' -f 2) | tr -cd '0-9.')
-curl -fsSL "https://github.com/mvdan/sh/releases/download/v${version}/shfmt_v${version}_linux_$(get_arch)" -o /usr/local/bin/shfmt
+version=$(basename $(curl --retry 5 --retry-delay 5 --retry-all-errors -I https://github.com/mvdan/sh/releases/latest 2>/dev/null | grep location | cut -d ' ' -f 2) | tr -cd '0-9.')
+curl --retry 5 --retry-delay 5 --retry-all-errors -fsSL "https://github.com/mvdan/sh/releases/download/v${version}/shfmt_v${version}_linux_$(get_arch)" -o /usr/local/bin/shfmt
 chmod a+x /usr/local/bin/shfmt
