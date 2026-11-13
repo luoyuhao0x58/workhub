@@ -168,6 +168,7 @@ services:
       - "no-new-privileges:true"
     environment:
       TZ: *default-timezone
+      RUSTFS_SERVER_DOMAINS: "rustfs:9000"
       RUSTFS_VOLUMES: /data
       RUSTFS_ADDRESS: 0.0.0.0:9000
       RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
